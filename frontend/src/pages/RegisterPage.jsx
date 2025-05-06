@@ -1,40 +1,54 @@
 import { useState } from 'react';
-import { registerUser } from '../api/authApi';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../styles/App.css';
 
-export default function RegisterPage() {
+const RegisterPage = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ nombre: '', correo: '', password: '', rol: 'estudiante' });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await registerUser(formData);
-      alert('Registro exitoso, ahora puedes iniciar sesión.');
-      navigate('/login');
-    } catch (error) {
-      alert(error.response?.data?.msg || 'Error en el registro');
-    }
+
+    axios.post('/api/auth/register', { username, password })
+      .then(response => {
+        localStorage.setItem('token', response.data.token);
+        navigate('/profile');
+      })
+      .catch(error => {
+        setErrorMessage('Error al registrarse, por favor intente de nuevo');
+      });
   };
 
   return (
-    <div className="container">
-      <h2>Registrarse</h2>
+    <div className="register-page">
+      <h1>Registrarse</h1>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="nombre" placeholder="Nombre" onChange={handleChange} required />
-        <input type="email" name="correo" placeholder="Correo" onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Contraseña" onChange={handleChange} required />
-        <select name="rol" onChange={handleChange}>
-          <option value="estudiante">Estudiante</option>
-          <option value="docente">Docente</option>
-        </select>
-        <button type="submit">Registrar</button>
+        <div>
+          <label>Usuario:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Contraseña:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        {errorMessage && <p className="error">{errorMessage}</p>}
+        <button type="submit">Registrarse</button>
       </form>
     </div>
   );
-}
+};
+
+export default RegisterPage;

@@ -1,37 +1,54 @@
 import { useState } from 'react';
-import { loginUser } from '../api/authApi';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../styles/App.css';
 
-export default function LoginPage() {
+const LoginPage = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ correo: '', password: '' });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const res = await loginUser(formData);
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      alert('Bienvenido!');
-      navigate('/profile');
-    } catch (error) {
-      alert(error.response?.data?.msg || 'Error en el login');
-    }
+
+    axios.post('/api/auth/login', { username, password })
+      .then(response => {
+        localStorage.setItem('token', response.data.token);
+        navigate('/profile');
+      })
+      .catch(error => {
+        setErrorMessage('Usuario o contraseña incorrectos');
+      });
   };
 
   return (
-    <div className="container">
-      <h2>Iniciar Sesión</h2>
+    <div className="login-page">
+      <h1>Iniciar sesión</h1>
       <form onSubmit={handleSubmit}>
-        <input type="email" name="correo" placeholder="Correo" onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Contraseña" onChange={handleChange} required />
+        <div>
+          <label>Usuario:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Contraseña:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        {errorMessage && <p className="error">{errorMessage}</p>}
         <button type="submit">Ingresar</button>
       </form>
     </div>
   );
-}
+};
+
+export default LoginPage;

@@ -1,41 +1,25 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
-const resourceRoutes = require('./routes/resourceRoutes');
-const db = require('./db'); // Importa tu conexión a la base de datos
-require('dotenv').config();
-
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use('/uploads', express.static('uploads'));
 
-// Rutas
-app.use('/api/auth', authRoutes);
-app.use('/api/resources', resourceRoutes);
+const connection = require('./config/db'); // Importar la conexión
+const authRoutes = require('./routes/authRoutes');
 
-// Conexión a la base de datos (asegúrate de que esté correctamente configurado en tu db.js)
-db.connect((err) => {
+// SOLO aquí haces la conexión una sola vez
+connection.connect((err) => {
   if (err) {
     console.error('Error al conectar a la base de datos:', err);
-    process.exit(1); // Detener la aplicación si no se puede conectar
-  } else {
-    console.log('Conexión exitosa a la base de datos');
+    return;
   }
-});
+  console.log('Conexión a la base de datos exitosa');
 
-// Manejador de errores generales para rutas no encontradas
-app.use((req, res, next) => {
-  res.status(404).json({ message: 'Ruta no encontrada' });
-});
+  // Si la conexión fue exitosa, recién ahí arrancas el servidor
+  app.use(cors());
+  app.use(express.json());
+  app.use('/api/auth', authRoutes);
 
-// Manejador de errores generales
-app.use((err, req, res, next) => {
-  console.error('Error del servidor:', err);
-  res.status(500).json({ message: 'Algo salió mal en el servidor' });
+  const PORT = 3001;
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en puerto ${PORT}`);
+  });
 });
-
-// Iniciar servidor
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));

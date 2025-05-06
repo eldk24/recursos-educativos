@@ -1,22 +1,31 @@
-import { useEffect, useState } from 'react';
-import '../styles/App.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-export default function ProfilePage() {
+const ProfilePage = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    setUser(userData);
+    // Obtener información del usuario logueado
+    axios.get('/api/auth/profile', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
+      .then(response => {
+        setUser(response.data);
+      })
+      .catch(error => {
+        console.error('Error al obtener el perfil:', error);
+      });
   }, []);
 
-  if (!user) return <div className="container">Cargando perfil...</div>;
+  if (!user) {
+    return <p>Cargando...</p>;
+  }
 
   return (
-    <div className="container">
-      <h2>Perfil de Usuario</h2>
-      <p><strong>Nombre:</strong> {user.nombre}</p>
-      <p><strong>Correo:</strong> {user.correo}</p>
-      <p><strong>Rol:</strong> {user.rol}</p>
+    <div className="profile-page">
+      <h1>Perfil de {user.username}</h1>
+      <p>Correo electrónico: {user.email}</p>
+      <p>Plan seleccionado: {user.plan}</p>
     </div>
   );
-}
+};
+
+export default ProfilePage;
