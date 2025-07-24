@@ -1,39 +1,37 @@
-const db = require('../config/db');
+const db = require('../config/db'); // Asegúrate de que la conexión a la DB esté bien configurada
 
-// Crear un recurso educativo
-exports.createResource = (req, res) => {
-  const { titulo, descripcion, tipo, categoria_id } = req.body;
-  const archivo_url = req.file ? req.file.filename : null;
-  const usuario_id = req.user.id; // viene del token
+// Agregar un recurso
+exports.addResource = (req, res) => {
+  const { nombre, descripcion, categoria_id, usuario_id } = req.body;
 
-  if (!titulo || !tipo) {
-    return res.status(400).json({ msg: 'Faltan datos obligatorios.' });
-  }
+  // Query para insertar un nuevo recurso
+  const query = 'INSERT INTO recursos (nombre, descripcion, categoria_id, usuario_id) VALUES (?, ?, ?, ?)';
+  db.query(query, [nombre, descripcion, categoria_id, usuario_id], (err, results) => {
+    if (err) {
+      console.error('Error al agregar el recurso:', err);
+      return res.status(500).json({ error: 'Error al agregar el recurso' });
+    }
 
-  const sql = 'INSERT INTO recursos SET ?';
-  const values = {
-    titulo,
-    descripcion,
-    tipo,
-    archivo_url,
-    categoria_id,
-    usuario_id,
-  };
-
-  db.query(sql, values, (err, result) => {
-    if (err) throw err;
-    res.status(201).json({ msg: 'Recurso creado exitosamente.' });
+    res.status(201).json({ message: 'Recurso agregado correctamente' });
   });
 };
 
-// Obtener todos los recursos
+// Obtener recursos
 exports.getResources = (req, res) => {
-  const sql = `SELECT recursos.*, categorias.nombre as categoria_nombre
-               FROM recursos
-               LEFT JOIN categorias ON recursos.categoria_id = categorias.id`;
+  const query = `
+    SELECT r.id, r.nombre, r.descripcion, c.nombre AS categoria, u.username AS usuario 
+    FROM recursos r
+    JOIN categorias c ON r.categoria_id = c.id
+    JOIN usuarios u ON r.usuario_id = u.id
+  `;
 
-  db.query(sql, (err, results) => {
-    if (err) throw err;
-    res.json(results);
+  // Query para obtener los recursos
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener los recursos:', err);
+      return res.status(500).json({ error: 'Error al obtener los recursos' });
+    }
+
+    res.status(200).json(results);
   });
 };

@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const resourceRoutes = require('./routes/resourceRoutes');
-const db = require('./db'); // Importa tu conexión a la base de datos
+const db = require('./config/db');  // Esto es correcto si 'server.js' está en la raíz y 'db.js' en 'config'
 require('dotenv').config();
 
 const app = express();

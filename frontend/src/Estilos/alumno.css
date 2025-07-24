@@ -1,0 +1,155 @@
+/* alumno.css */
+
+.alumno-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  background: #f3f4f6;
+  min-height: 100vh;
+}
+
+.alumno-card {
+  width: 100%;
+  max-width: 1000px;
+  background: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+.alumno-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.alumno-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.alumno-header p {
+  margin: 0;
+  color: #555;
+}
+
+.alumno-header button {
+  padding: 0.6rem 1.2rem;
+  background: #e11d48;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.alumno-header button:hover {
+  background: #be123c;
+}
+
+.alumno-profile {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.alumno-photo,
+.alumno-career {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.alumno-photo img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.alumno-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.career-name {
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.5rem;
+  background: #eef2ff;
+  border-radius: 8px;
+}
+
+select {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.alumno-courses {
+  margin-bottom: 2rem;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.filters input {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+}
+
+.course-card {
+  padding: 1rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.course-card h3 {
+  margin: 0 0 0.5rem;
+}
+
+.filtered-files {
+  margin-top: 2rem;
+}
+
+.filtered-files h2 {
+  margin-bottom: 1rem;
+}
+
+.filtered-files ul {
+  list-style: none;
+  padding: 0;
+}
+
+.filtered-files li {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.file-type {
+  color: #6b7280;
+}

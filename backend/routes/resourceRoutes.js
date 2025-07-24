@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { createResource, getResources } = require('../controllers/resourceController');
-const upload = require('../middlewares/uploadMiddleware');
-const authMiddleware = require('../middlewares/authMiddleware');
+const resourceController = require('../controllers/resourceController'); // Ruta al controlador
 
-// Subir recurso (protegido)
-router.post('/', authMiddleware, upload.single('archivo'), createResource);
+// Ruta para agregar un recurso
+router.post('/add', resourceController.addResource);
 
-// Obtener recursos
-router.get('/', getResources);
+// Ruta para obtener los recursos
+router.get('/', resourceController.getResources);
 
 module.exports = router;

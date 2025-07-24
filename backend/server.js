@@ -1,41 +1,83 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
-const resourceRoutes = require('./routes/resourceRoutes');
-const db = require('./db'); // Importa tu conexión a la base de datos
-require('dotenv').config();
+const mysql = require('mysql2/promise');
 
 const app = express();
+const PORT = 3001;
+
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
 
-// Rutas
-app.use('/api/auth', authRoutes);
-app.use('/api/resources', resourceRoutes);
+// Configuración de conexión MySQL
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: '8M@riokart8',
+  database: 'UsuariosDB',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
-// Conexión a la base de datos (asegúrate de que esté correctamente configurado en tu db.js)
-db.connect((err) => {
-  if (err) {
-    console.error('Error al conectar a la base de datos:', err);
-    process.exit(1); // Detener la aplicación si no se puede conectar
-  } else {
-    console.log('Conexión exitosa a la base de datos');
+// Registro de usuario
+app.post('/api/register', async (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  if (!['admin', 'estudiante', 'docente'].includes(role)) {
+    return res.status(400).json({ message: 'Rol inválido' });
+  }
+
+  try {
+    const [existingUsers] = await pool.query('SELECT * FROM Usuarios WHERE email = ?', [email]);
+
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ message: 'El usuario ya existe' });
+    }
+
+    await pool.query(
+      'INSERT INTO Usuarios (name, email, password, role) VALUES (?, ?, ?, ?)',
+      [name, email, password, role]
+    );
+
+    res.status(201).json({ message: 'Usuario registrado correctamente' });
+  } catch (error) {
+    console.error('❌ Error en /register:', error);
+    res.status(500).json({ message: 'Error del servidor' });
   }
 });
 
-// Manejador de errores generales para rutas no encontradas
-app.use((req, res, next) => {
-  res.status(404).json({ message: 'Ruta no encontrada' });
+// Login de usuario
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const [users] = await pool.query(
+      'SELECT * FROM Usuarios WHERE email = ? AND password = ?',
+      [email, password]
+    );
+
+    if (users.length === 0) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+    const user = users[0];
+
+    if (!['admin', 'estudiante', 'docente'].includes(user.role)) {
+      return res.status(403).json({ message: 'Rol no reconocido' });
+    }
+
+    res.status(200).json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    });
+  } catch (error) {
+    console.error('❌ Error en /login:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
 });
 
-// Manejador de errores generales
-app.use((err, req, res, next) => {
-  console.error('Error del servidor:', err);
-  res.status(500).json({ message: 'Algo salió mal en el servidor' });
+app.listen(PORT, () => {
+  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
 });
-
-// Iniciar servidor
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));

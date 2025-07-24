@@ -1,22 +1,18 @@
-import { useEffect, useState } from 'react';
-import '../styles/App.css';
+// src/pages/ProfilePage.jsx
+import React from 'react';
+import Navbar from '../components/Navbar';
 
-export default function ProfilePage() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    setUser(userData);
-  }, []);
-
-  if (!user) return <div className="container">Cargando perfil...</div>;
+const ProfilePage = () => {
+  const user = JSON.parse(localStorage.getItem('currentUser')) || {};
 
   return (
-    <div className="container">
-      <h2>Perfil de Usuario</h2>
-      <p><strong>Nombre:</strong> {user.nombre}</p>
-      <p><strong>Correo:</strong> {user.correo}</p>
-      <p><strong>Rol:</strong> {user.rol}</p>
+    <div>
+      <Navbar />
+      <h2>Mi Perfil</h2>
+      <p>Nombre: {user.name}</p>
+      <p>Correo: {user.email}</p>
     </div>
   );
-}
+};
+
+export default ProfilePage;
